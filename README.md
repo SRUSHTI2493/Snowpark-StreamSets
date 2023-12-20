@@ -184,7 +184,58 @@ Activate the preview by selecting the eye icon in the top right of the canvas.
 
 ![image](https://github.com/SRUSHTI2493/Snowpark-StreamSets/assets/87080882/391195c0-6dc9-4bde-9e8d-a8295527db1f)
 ![image](https://github.com/SRUSHTI2493/Snowpark-StreamSets/assets/87080882/c41efd10-bff6-4fe6-9651-b768faac8121)
+ 
+**The preview will generate the SQL that represents the pipeline and it will return the results for each processor. Since there are fewer than ten total records in the two origin tables, there is no need to adjust the default Preview Batch Record size of 10 records.
+Once the preview is loaded, clicking on any of the processors will show a sample of records from the input and output streams. Selecting the Slowly Changing Dimension processor should result in an output like this:**
+
+![image](https://github.com/SRUSHTI2493/Snowpark-StreamSets/assets/87080882/99ba5a8e-dd52-4a50-9f5b-c47a9d43715d)
+
+🔹 The input side shows the first two records that are already loaded in the EMPLOYEES table and the third record comes from the UPDATE_FEED table.
+
+🔹 There are no update records for ID 3, Ryan Howard, and that record does not appear in the output stream.
+
+🔹 The UPDATE_FEED does contain a title update for ID 2, Dwight Schrute, so the output stream has 2 corresponding records. One record that will serve as the update record to make the old record with the Title "Sales Rep" inactive, and a record that will be inserted as the new active record, with the title "Assistant to the Regional Manager".
+
+🔹 Note that the UPDATE_FEED record on the input has an additional column CAKE_PREFERENCE, but since the Behavior for New Fields setting was set to Remove from Change Data in step 4, this column is just ignored.
+
+# 8. Add a Transformation
+To transform the data in the pipeline, add an Apply Functions processor between the Updates origin and the Slowly Changing Dimension processor. Click on the line connecting the two processors, and then select the Apply Functions
+
+![image](https://github.com/SRUSHTI2493/Snowpark-StreamSets/assets/87080882/43c627bb-d9db-4b23-9907-eaa5d7134d96)
+
+![image](https://github.com/SRUSHTI2493/Snowpark-StreamSets/assets/87080882/59ee49a4-3aaf-47eb-96c7-df987f59cc90)
+**On the Functions tab of the processor, add a simple function to make all the values upper case. This can be done simply by setting Field Expression to the regular expression .*, which will include all columns. Set the Function Type to String, and choose the UPPER function from the String Function list.**
+
+![image](https://github.com/SRUSHTI2493/Snowpark-StreamSets/assets/87080882/c69bc42e-4a35-4a16-87ec-7aa4128fc3e2)
+
+**Now preview the results, and select the Apply Functions processor to see the input and output.**
+![image](https://github.com/SRUSHTI2493/Snowpark-StreamSets/assets/87080882/51ab188d-5c6b-4eea-82d2-bf5e88c5cccb)
+
+# 9. Create and Run Pipeline as a Job
+**Before being able to run the pipeline, it needs to be published. Once the preview is closed, check the pipeline in.**
+
+![image](https://github.com/SRUSHTI2493/Snowpark-StreamSets/assets/87080882/0c1a9e7f-4211-431c-bcb1-7982f2facb96)
+**Enter a Commit Message and select Publish and Next.**
+
+![image](https://github.com/SRUSHTI2493/Snowpark-StreamSets/assets/87080882/05964335-13e9-47e4-b5dd-f08f32559a62)
+
+**Next, choose Save and Create New Job.**
+![image](https://github.com/SRUSHTI2493/Snowpark-StreamSets/assets/87080882/cb85a656-7bb6-44f8-9568-d9b6f684280c)
+
+**Update the Job name if desired, add a job description, and select Next. On the Select Pipeline option, select Next, and select Save & Next for the next two options.**
+![image](https://github.com/SRUSHTI2493/Snowpark-StreamSets/assets/87080882/1d6e6d55-2938-4936-b327-1f54bb096b8d)
+
+**The Job page will now appear, and the job status can be seen at the top of the canvas and in the window below the canvas.**
+![image](https://github.com/SRUSHTI2493/Snowpark-StreamSets/assets/87080882/052db512-5470-41d0-a2d2-fc1a50b76fd0)
 
 
+# 10. Check Results in Snowflake
 
+Run the query SELECT * FROM DEMO.HCM.EMPLOYEES; to see the updated results in the EMPLOYEES table. Here it can be seen that the record with the updated title and upper case names and title was added as a second version of the record, and the previous record was expired.
 
+![image](https://github.com/SRUSHTI2493/Snowpark-StreamSets/assets/87080882/2984763c-0e28-4722-896f-8e16b5cc97d8)
+**While in Snowflake, check out the Query History to see the Merge record that the StreamSets job created.**
+![image](https://github.com/SRUSHTI2493/Snowpark-StreamSets/assets/87080882/f63615c6-0628-44e9-b2f2-aa83809cea44)
+
+# 11. Conclusion
+Congratulations on completing this lab!......
